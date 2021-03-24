@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:23:54 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/17 18:42:47 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/24 05:47:52 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ namespace ft
 		vector(_InputIterator <_Val> first, _InputIterator <_Val> last,
 					const allocator_type& alloc = allocator_type())
 		{
+			allocator = alloc;
 			_capacity = last - first;
 			_size = _capacity;
 			data = allocator.allocate(_capacity);
@@ -478,7 +479,7 @@ namespace ft
 				if (l[i] > r[i]) return true;
 				if (r[i] > l[i]) return false;
 			}
-			return (l._size == r._size);
+			return (l._size >= r._size);
 		}
 
 		friend bool operator<=(const vector& l, const vector& r)
@@ -487,7 +488,7 @@ namespace ft
 				if (l[i] < r[i]) return true;
 				if (r[i] < l[i]) return false;
 			}
-			return (l._size == r._size);
+			return (l._size <= r._size);
 		}
 		
 		friend bool operator>(const vector& l, const vector& r)
@@ -506,8 +507,8 @@ namespace ft
 				if (r[i] < l[i]) return false;
 			}
 			return (l._size < r._size);
-			// Iterator<value_type> first_l = l.begin();
-			// Iterator<value_type> first_r = r.begin();
+			// Iterator<const value_type> first_l = l.begin();
+			// Iterator<const value_type> first_r = r.begin();
 		
 			// for (; (first_l != l.end()) && (first_r != r.end()); ++first_l, (void) ++first_r ) {
 			// 	if (*first_l < *first_r) return true;

@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/11 18:11:24 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/17 18:20:41 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/24 05:46:07 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ namespace ft
 		Iterator():ptr(0) {}
 		Iterator(const Iterator& other): ptr(other.ptr) {}
 		Iterator(const pointer other): ptr(other) {}
-		virtual ~Iterator() {}
+		~Iterator() {}
 		template <template <typename> class const_iterator>
 		operator const_iterator<const value_type>() 
 		{
