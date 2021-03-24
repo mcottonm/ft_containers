@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/18 18:28:19 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/23 19:49:30 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/24 16:40:24 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,11 +102,11 @@ namespace ft
 		reversBiIterator & operator= (const reversBiIterator& other) { _node = other._node; return *this; }
 		reference operator*() const { return *_node->valptr(); }
 		pointer operator->() const { return _node->valptr(); }
-		self_type& operator--() { _node = _node->_next; return *this; }
-      	self_type operator--(int) { self_type __tmp = *this; _node = _node->_next; return __tmp; }
-		self_type& operator++() { _node = _node->_prev; return *this; }
-      	self_type operator++(int) { self_type __tmp = *this; _node = _node->_prev; return __tmp; }
-		bool operator==(const self_type& __x) const { return _node == __x._node; }
-      	bool operator!=(const self_type& __x) const { return _node != __x._node; }
+		reversBiIterator& operator--() { _node = _node->_next; return *this; }
+      	reversBiIterator operator--(int) { reversBiIterator __tmp = *this; _node = _node->_next; return __tmp; }
+		reversBiIterator& operator++() { _node = _node->_prev; return *this; }
+      	reversBiIterator operator++(int) { reversBiIterator __tmp = *this; _node = _node->_prev; return __tmp; }
+		bool operator==(const reversBiIterator& __x) const { return _node == __x._node; }
+      	bool operator!=(const reversBiIterator& __x) const { return _node != __x._node; }
 	};
 }

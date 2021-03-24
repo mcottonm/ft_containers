@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:23:54 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/24 05:47:52 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/24 19:04:08 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,12 +185,12 @@ namespace ft
 			return const_reverse_iterator(data - 1);
 		}
 //capcity:
-		size_type size(void)
+		size_type size(void) const
 		{
 			return(_size);
 		}
 		
-		size_type capacity(void)
+		size_type capacity(void) const
 		{
 			return(_capacity);
 		}
@@ -518,4 +518,10 @@ namespace ft
 		}
 
 	};
+	
+	template <class T, class Alloc>
+ 	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+	{
+		x.swap(y);
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 20:37:27 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/24 07:56:53 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/24 18:59:56 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,14 +108,8 @@ namespace ft
 		}
 
 	public:
-		
-		// template <template <typename> class const_list>
-		// operator const_list<const value_type>()
-		// {
-		// 	return const_list<const value_type >(const *this);
-		// }
-		
-		list(const allocator_type& alloc = allocator_type())
+			
+		explicit list(const allocator_type& alloc = allocator_type())
 		:allocator(alloc)
 		,_head(_new_empty_node())
 		,_tail(_head)
@@ -123,7 +117,7 @@ namespace ft
 		{
 		}
 		
-		list (size_type n, const value_type& val = value_type(),
+		explicit list (size_type n, const value_type& val = value_type(),
                 const allocator_type& alloc = allocator_type())
 		:allocator(alloc)
 		,_head(_new_empty_node())
@@ -238,6 +232,7 @@ namespace ft
 		const_iterator end() const { return const_iterator(_tail); }
 
 		reverse_iterator rbegin() { return reverse_iterator(!_size ? _tail : _tail->_prev); }
+		// reverse_iterator rbegin() { return _head->_next; }
 		reverse_iterator rend() { return _tail; }
 
 		const_reverse_iterator rbegin() const { return const_reverse_iterator(!_size ? _tail : _tail->_prev); }
@@ -624,17 +619,17 @@ namespace ft
 		
 //relational operators:
 
-		friend bool operator==(const list& lhs, const list& rhs)
-		{
-			const_iterator first_l = lhs.begin();
-			const_iterator first_r = rhs.begin();
+		// friend bool operator==(const list& lhs, const list& rhs)
+		// {
+		// 	const_iterator first_l = lhs.begin();
+		// 	const_iterator first_r = rhs.begin();
 		
-			for (; (first_l != lhs.end()) && (first_r != rhs.end()); ++first_l, (void) ++first_r ) {
-				if (*first_l < *first_r) return true;
-				if (*first_r < *first_l) return false;
-			}
-			return (first_l != lhs.end()) && (first_r == rhs.end());
-		}
+		// 	for (; (first_l != lhs.end()) && (first_r != rhs.end()); ++first_l, (void) ++first_r ) {
+		// 		if (*first_l < *first_r) return true;
+		// 		if (*first_r < *first_l) return false;
+		// 	}
+		// 	return (first_l != lhs.end()) && (first_r == rhs.end());
+		// }
 
 	};
 
