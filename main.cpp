@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:34:34 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/24 18:07:36 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/25 21:13:50 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,15 +64,16 @@ bool comp(int a, int b)
 
 void foo()
 {
-	ft::deque<int> l(1,9);
+	ft::list<int> l(1,9);
+	ft::list<int> a;
 
 	l.resize(2);
-	ft::deque<int>::iterator it = l.end();
-	it = it + 1;
+	ft::list<int>::iterator it = l.end();
+	printf("%d\n", a == l);
 	
 	// printf("%lu\n", l.size());
-	for (int i = 0; i <= l.size(); i++)
-		printf("%d\n", l[0]);
+	// for (int i = 0; i <= l.size(); i++)
+	// 	printf("%d\n", l[0]);
 	// ft::deque<int> h(8, 1);
 	// ft::deque<int>::const_iterator o = l.begin();
 	// l = h;

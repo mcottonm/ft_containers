@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 20:37:27 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/24 18:59:56 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/25 21:17:17 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,7 +232,6 @@ namespace ft
 		const_iterator end() const { return const_iterator(_tail); }
 
 		reverse_iterator rbegin() { return reverse_iterator(!_size ? _tail : _tail->_prev); }
-		// reverse_iterator rbegin() { return _head->_next; }
 		reverse_iterator rend() { return _tail; }
 
 		const_reverse_iterator rbegin() const { return const_reverse_iterator(!_size ? _tail : _tail->_prev); }
@@ -513,22 +512,52 @@ namespace ft
 			_merge_sort(&b, comp);
 			*head = sorted(a, b, comp);
 		}
-		
+	
+	private:
+
+		void avsb(node_type** a, node_type** b, node_type **c)
+		{
+			node_type* tmpa = (*a)->_next;
+			node_type* tmpb = (*b)->_next;
+
+			(*c)->_next = (*a);
+			(*a)->_prev = (*c);
+			(*a)->_next = (*b);
+			(*b)->_prev = (*a);
+			(*c) = (*b);
+			*a = tmpa;
+			*b = tmpb;
+		}
+
 	public:		
 		template <class Compare>
 		void merge(list& other, Compare comp)
 		{
-			splice(end(), other);
-			_merge_sort(&_head, comp);
+			if (other._head == _head)
+				return ;
+			node_type* new_list = _tail;
+			_size += other._size;
 			
-			_head->_prev = _tail;
-			_tail->_next = _head;
-			node_type* tmp = _head;
-			while (tmp != _tail)
+			while (_head != _tail && other._head != other._tail)
 			{
-				tmp->_next->_prev = tmp;
-				tmp = tmp->_next;
+				if (comp(_head->_value, other._head->_value))
+					avsb(&_head, &(other._head), &new_list);
+				else
+					avsb(&(other._head), &_head, &new_list);
+				new_list->_next = _head;
 			}
+			_head = _tail->_next;
+			if (other._head != other._tail)
+			{
+				new_list->_next = other._head;
+				other._head->_prev = new_list;
+				other._tail->_prev->_next = _tail;
+				_tail->_prev = other._tail->_prev;
+			}
+			other._tail->_next = other._tail;
+			other._tail->_prev = other._tail;
+			other._head = other._tail;
+			other._size = 0;
 		}
 
 		void merge(list& other)
@@ -602,7 +631,13 @@ namespace ft
 		template <class Compare>
   		void sort (Compare comp)
 		{
-			merge(*this, comp);
+			node_type* tmp = _head;
+			_merge_sort(&_head, comp);
+			while (tmp != _tail)
+			{
+				tmp->_next->_prev = tmp;
+				tmp = tmp->_next;
+			}
 		}
 
 		void reverse()
@@ -644,7 +679,7 @@ namespace ft
 	template <class T, class Alloc>
   	bool operator== (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 	{
-		typedef typename list<T,Alloc>::const_iterator const_iterator;
+		typedef typename const list<T,Alloc>::const_iterator const_iterator;
 		const_iterator first_l = lhs.begin();
 		const_iterator first_r = rhs.begin();
 	
