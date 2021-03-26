@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 20:37:27 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/25 21:17:17 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/26 19:49:42 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,8 +228,8 @@ namespace ft
 		iterator begin() { return iterator(_head); }
 		iterator end() { return iterator(_tail); }
 
-		const_iterator begin() const { return const_iterator(_head); }
-		const_iterator end() const { return const_iterator(_tail); }
+		const_iterator begin() const { return reinterpret_cast<_list_node<const value_type>*>(_head); }
+		const_iterator end() const { return reinterpret_cast<_list_node<const value_type>*>(_tail); }
 
 		reverse_iterator rbegin() { return reverse_iterator(!_size ? _tail : _tail->_prev); }
 		reverse_iterator rend() { return _tail; }
@@ -679,9 +679,11 @@ namespace ft
 	template <class T, class Alloc>
   	bool operator== (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 	{
-		typedef typename const list<T,Alloc>::const_iterator const_iterator;
-		const_iterator first_l = lhs.begin();
-		const_iterator first_r = rhs.begin();
+		// typedef typename const list<T,Alloc>::const_iterator const_iterator;
+		// const_iterator first_l = lhs.begin();
+		// const_iterator first_r = rhs.begin();
+		typename list<T,Alloc>::const_iterator first_l = lhs.begin();
+		typename list<T,Alloc>::const_iterator first_r = rhs.begin();
 	
 		for (; (first_l != lhs.end()) && (first_r != rhs.end()); ++first_l, (void) ++first_r ) {
 			if (*first_l != *first_r) return false;

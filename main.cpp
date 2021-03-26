@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:34:34 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/25 21:13:50 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/26 23:11:39 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include "ft_deque.hpp"
 #include <list>
 #include <queue>
+#include "tree.hpp"
 
 class A
 {
@@ -64,44 +65,10 @@ bool comp(int a, int b)
 
 void foo()
 {
-	ft::list<int> l(1,9);
-	ft::list<int> a;
-
-	l.resize(2);
-	ft::list<int>::iterator it = l.end();
-	printf("%d\n", a == l);
-	
-	// printf("%lu\n", l.size());
-	// for (int i = 0; i <= l.size(); i++)
-	// 	printf("%d\n", l[0]);
-	// ft::deque<int> h(8, 1);
-	// ft::deque<int>::const_iterator o = l.begin();
-	// l = h;
-	// printf("%d\n", *o);
-	// ft::list<int> a(2, 8);
-	// // ft::list<int> b(a.begin(), a.end());
-	// ft::list<int> b(2);
-	// ft::list<int> c(2, 10);
-	// ft::list<int> d;
-	// d = c;
-	// put_collection(b, "b");
-	// d.assign(3, 4);
-	// ft::list<int>::iterator it1 = c.begin();
-	// ft::list<int>::iterator it2 = c.end();
-	// ft::list<int>::iterator it = a.end();
-	// a.merge(c,comp);
-	// a.merge(b,comp);
-	// // a.reverse();
-	// // printf("%d\n", a == a);
-	// // a.splice(--it, c, it1, it2);
-	// // a.insert(it, 7);
-	// // a.assign(it2, it1);
-	// put_collection(a, "a");
-	// // // //*--it1 = 8;
-	// put_collection(c, "c");
-	// put_collection(d, "d");
-	// printf("%lu\n", d.max_size());
-	// d.insert(it1,3);
+	tree_node* y = 0;
+	for(int i = 0; i < 10; i++)
+		insert(&y,i, comp);
+	printf("%d\n", y->left->value);
 }
 
 int main()

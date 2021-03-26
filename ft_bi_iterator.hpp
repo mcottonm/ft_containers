@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/18 18:28:19 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/24 16:40:24 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/26 19:45:50 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ namespace ft
 		typedef value_type*					pointer;
 		typedef value_type&					reference;
 		typedef _list_node<value_type>		node_type;
+		typedef const _list_node<const value_type> const_node_type;
 		
 	private:
 		node_type*					_node;
@@ -57,6 +58,7 @@ namespace ft
 		BidirectionalIterator(): _node() {}
 		BidirectionalIterator(const BidirectionalIterator& other): _node(other._node) {}
 		BidirectionalIterator(node_type* node): _node(node) {}
+		BidirectionalIterator(const_node_type* node): _node(node) {}
 		BidirectionalIterator & operator= (const BidirectionalIterator& other) { _node = other._node; return *this; }
 		
 		template <template <typename> class const_iterator>
