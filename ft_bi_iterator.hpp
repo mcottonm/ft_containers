@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/18 18:28:19 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/26 19:45:50 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:59:23 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,7 @@ namespace ft
 		_list_node(struct _list_node* prev = NULL, struct _list_node* next = NULL, const T& val = T())
 			: _prev(prev), _next(next), _value(val) {}
 
-		_list_node(struct _list_node& other):_prev(other->prev), _next(other->next), _value(other._value) {}
-
-		// template <template <typename> class const_noda>
-		// operator const_noda<const T>() 
-		// {
-		// 	return const_noda<const T>(this);
-		// }
+		_list_node(struct _list_node& other):_prev(other->_prev), _next(other->_next), _value(other._value) {}
 		
 		T* valptr() { return &_value; }
 		const T* valptr() const { return &_value; }

@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 20:37:27 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/26 19:49:42 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:37:00 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -457,6 +457,7 @@ namespace ft
 		}
 
 	private:
+
 		template <class Compare>
 		node_type* sorted(node_type* a, node_type* b, Compare comp)
 		{
@@ -512,8 +513,6 @@ namespace ft
 			_merge_sort(&b, comp);
 			*head = sorted(a, b, comp);
 		}
-	
-	private:
 
 		void avsb(node_type** a, node_type** b, node_type **c)
 		{
@@ -529,14 +528,15 @@ namespace ft
 			*b = tmpb;
 		}
 
-	public:		
+	public:
+	
 		template <class Compare>
 		void merge(list& other, Compare comp)
 		{
 			if (other._head == _head)
 				return ;
-			node_type* new_list = _tail;
 			_size += other._size;
+			node_type* new_list = _tail;
 			
 			while (_head != _tail && other._head != other._tail)
 			{
