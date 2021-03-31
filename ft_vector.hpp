@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:23:54 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/24 19:04:08 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/29 17:53:50 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,9 @@ namespace ft
 
 	private:
 		allocator_type								allocator;
+		pointer										data;
 		size_type									_size;
 		size_type									_capacity;
-		pointer										data;
 
 	public:
 //coplien:
@@ -103,11 +103,11 @@ namespace ft
 		}
 		
 		vector(const vector& other)
-		:allocator(other.allocator)
+		: allocator(other.allocator)
 		, _size(other._size)
 		, _capacity(other._capacity)
-		, data(allocator.allocate(_capacity))
 		{
+			data = allocator.allocate(_capacity);
 			for(size_t i = 0; i < _size; i++)
 				allocator.construct(&data[i], other.data[i]);
 		}
@@ -158,12 +158,12 @@ namespace ft
 
 		reverse_iterator rbegin()
 		{
-			return reverse_iterator(!_size ? 0 : data + _size - 1);
+			return reverse_iterator(!_size ? 0 : end());
 		}
 
 		const_reverse_iterator rbegin() const
 		{
-			return const_reverse_iterator(!_size ? 0 : data + _size - 1);
+			return const_reverse_iterator(!_size ? 0 : end());
 		}	
 		iterator end()
 		{
@@ -216,7 +216,7 @@ namespace ft
 		void reserve(size_type n)
 		{
 			if (n >= max_size())
-				throw std::length_error("Out of max size.");
+				throw std::length_error("Out of max size.\n");
 			if (_capacity < n)
 			{
 				pointer tmp = allocator.allocate(n);
@@ -286,7 +286,7 @@ namespace ft
 			{
 				this->~vector();
 				if (new_size > max_size())
-					throw std::length_error("Out of max size.");
+					throw std::length_error("Out of max size.\n");
 				data = allocator.allocate(new_size);
 				_capacity = new_size;
 			}
@@ -303,6 +303,8 @@ namespace ft
 
 		void assign (size_type n, const value_type& val)
 		{
+			if (_capacity)
+				this->~vector();
 			reserving(n);
 			for(size_type i = 0; i < _size; i++)
 				allocator.destroy(&data[i]);
@@ -340,6 +342,8 @@ namespace ft
 				reserve(2 * _capacity);
 			if (_capacity < n)
 				reserve(n);
+			if (!n)
+				reserve(1);
 		}
 
 		void shifting(iterator position, size_type range)
@@ -359,7 +363,7 @@ namespace ft
 			}
 			else if (position < end())
 			{
-				reserving(_size + 1);
+				reserving(_size);
 				position = begin() + position_shift;
 				shifting(position, 1);
 				*position = val;

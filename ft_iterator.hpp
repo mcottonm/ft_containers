@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/11 18:11:24 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/24 05:46:07 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/29 16:11:54 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,9 @@ namespace ft
 		{
 			return const_iterator<const value_type>(ptr);
 		}
-		Iterator base()
+		pointer base() const
 		{
-			return(this);
+			return(ptr);
 		}
 		Iterator & operator= (const Iterator& other) { ptr = other.ptr; return *this; }
 		Iterator & operator= (const pointer other) { ptr = other; return *this; }
@@ -112,9 +112,16 @@ namespace ft
 		
 	public:
 		reverseIterator():ptr(0) {}
+		reverseIterator(const Iterator& other): ptr(other.base() - 1) {}
 		reverseIterator(const reverseIterator& other): ptr(other.ptr) {}
 		reverseIterator(const pointer other): ptr(other) {}
 		virtual ~reverseIterator() {}
+		
+		template <template <typename> class const_iterator>
+		operator const_iterator<const value_type>() 
+		{
+			return const_iterator<const value_type>(ptr);
+		}
 		reverseIterator & operator= (const reverseIterator& other) { ptr = other.ptr; return *this; }
 		reverseIterator & operator= (const pointer other) { ptr = other; return *this; }
 		reference operator* () const { return *ptr; }
@@ -140,22 +147,22 @@ namespace ft
 
 		friend bool operator>=(const reverseIterator& l, const reverseIterator& r)
 		{
-			return l.ptr >= r.ptr;
+			return l.ptr <= r.ptr;
 		}
 
 		friend bool operator<=(const reverseIterator& l, const reverseIterator& r)
 		{
-			return l.ptr <= r.ptr;
+			return l.ptr >= r.ptr;
 		}
 		
 		friend bool operator<(const reverseIterator& l, const reverseIterator& r)
 		{
-			return l.ptr < r.ptr;
+			return l.ptr > r.ptr;
 		}
 
 		friend bool operator>(const reverseIterator& l, const reverseIterator& r)
 		{
-			return l.ptr > r.ptr;
+			return l.ptr < r.ptr;
 		}
 		
 		friend difference_type operator-(const reverseIterator& l, const reverseIterator& r)

@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:34:34 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/28 17:56:19 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/03/31 20:35:37 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 #include "ft_deque.hpp"
 #include <list>
 #include <queue>
-// #include "tree.hpp"
 #include "ft_map.hpp"
 #include <map>
 
@@ -67,29 +66,38 @@ bool comp(int a, int b)
 
 void foo()
 {
+	// std::list<int> a;
+	// a.push_back(1);
+	// a.push_back(2);
+	// a.push_back(3);
 
-	ft::map<int,int> m;
-	ft::pair<int,int> l(0,6);
-	ft::pair<int,int> ll(1,2);
-	ft::pair<int,int> lll(2,2);
-	m.insert(l);
-	m.insert(ll);
-	m.insert(lll);
-	printf("%d %d\n", m._root->value._key, m._root->value._content);
-	// std::pair<int, int> i1(4,2);
-	// std::pair<int, int> i2(1,0);
-	// std::pair<int, int> i3(9,10);
-	// std::pair<int,int> out;
-	// std::map<int, int> l;
+	// ft::list<int>::iterator itr(a.end());
+	// ft::list<int>::const_iterator it(a.begin());
+	// // printf("%d\n", itr == it);
+	// printf("%d\n", *itr);
+	// printf("%d\n", *it);
+	ft::pair<int, int> i1(5,2);
+	ft::pair<int, int> i2(4,0);
+	ft::pair<int, int> i3(2,10);
+	ft::pair<int, int> i4(3,10);
+	ft::pair<int, int> i5(6,10);
+	ft::pair<int, int> i6(0,2);
+	ft::pair<int,int> out1;
+	ft::map<int, int> l;
+	ft::pair<ft::map<int,int>::iterator, bool> out;
 	
-	// l.insert(i1);
-	// l.insert(i2);
-	// l.insert(i3);
-
-	// std::map<int,int>::iterator it = l.end();
-	// out = *--it;
-	// std::cout << out.first << std::endl;
+	l.insert(i1);
+	l.insert(i2);
+	l.insert(i3);
+	l.insert(i4);
+	l.insert(i5);
+	l.insert(i6);
+	// out = l.insert(i5);
+	ft::map<int,int>::iterator it = l.begin();
+	// std::cout << (*(out.first)).first << std::endl;
 	// std::cout << out.second << std::endl;
+	std::cout << (*(++++++++++++it)).first << std::endl;
+	std::cout << (*(it)).second << std::endl;
 	// tree_node* y = 0;
 
 	// for(int i = 0; i < 9; i++)
