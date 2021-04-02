@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:34:34 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/31 20:35:37 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/02 20:18:33 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,11 +93,15 @@ void foo()
 	l.insert(i5);
 	l.insert(i6);
 	// out = l.insert(i5);
-	ft::map<int,int>::iterator it = l.begin();
+	ft::map<int, int> t(l);
+	ft::map<int, int> j;
+	j = t;
+	// ft::map<int,int>::const_iterator it = t.begin();
 	// std::cout << (*(out.first)).first << std::endl;
-	// std::cout << out.second << std::endl;
-	std::cout << (*(++++++++++++it)).first << std::endl;
-	std::cout << (*(it)).second << std::endl;
+	// std::cout << l.size() << std::endl;
+	// it++++++;
+	// std::cout << (*(it)).first << std::endl;
+	// std::cout << (*(it)).second << std::endl;
 	// tree_node* y = 0;
 
 	// for(int i = 0; i < 9; i++)

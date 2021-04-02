@@ -6,13 +6,11 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 15:38:25 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/31 17:16:17 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/02 15:22:49 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-// # include "b-r_tree_engine.hpp"
-// # include "ft_map.hpp"
 
 # define RED 0
 # define BLACK 1
@@ -68,13 +66,6 @@ namespace ft
 		: first(pr.first)
 		, second(pr.second)
 		{
-		}
-
-		pair& operator= (const pair& pr)
-		{
-			first = pr.first;
-			second = pr.second;
-			return (*this);
 		}
 	};
 	
@@ -139,6 +130,29 @@ namespace ft
                 return iter_finder1(_n->_right);
             return iter_finder2(_n);
         }
+
+		node_type* iter_finder1_rev(node_type* _n)
+        {
+            if (_n->_right)
+                return iter_finder1_rev(_n->_right);
+            return _n;
+        }
+		
+		node_type* iter_finder2_rev(node_type* _n)
+        {
+            if (_n->_parent && _n->_parent->_right == _n)
+                return(_n->_parent);
+            else if (_n->_parent)
+                return iter_finder2_rev(_n->_parent);
+            return _n;
+        }
+		
+		node_type* iter_finder_rev(node_type* _n)
+		{
+			if (_n->_left)
+				return iter_finder1_rev(_n->_left);
+			return iter_finder2_rev(_n);
+		}
 		
 	public:
 	
@@ -161,12 +175,10 @@ namespace ft
 
 		reference operator*() const { return *&_node->value; }
 		pointer operator->() const { return &_node->value; }
-		// template< class Key, class T1, class Compare, class Alloc >
 		self_type& operator++() { _node = iter_finder(_node); return *this; }
-		// template< class Key, class T1, class Compare, class Alloc >
       	self_type operator++(int) { self_type __tmp = *this; _node = iter_finder(_node); return __tmp; }
-		self_type& operator--() { _node = _node->_prev; return *this; }
-      	self_type operator--(int) { self_type __tmp = *this; _node = _node->_prev; return __tmp; }
+		self_type& operator--() { _node = iter_finder_rev(_node); return *this; }
+      	self_type operator--(int) { self_type __tmp = *this; _node = iter_finder_rev(_node); return __tmp; }
 		bool operator==(const self_type& __x) const { return _node == __x._node; }
       	bool operator!=(const self_type& __x) const { return _node != __x._node; }
 	};

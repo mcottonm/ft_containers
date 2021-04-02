@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 15:33:13 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/31 20:34:37 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/02 20:16:26 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 # include <iostream>
 # include <vector>
 # include "ft_map_iterator.hpp"
-// # include "b-r_tree_engine.hpp"
 
 namespace ft
 {
@@ -57,26 +56,28 @@ namespace ft
     
     //TREEE:
     private:
-        // node_type* grandp (node_type* n);
-		// static node_type* uncle (node_type* n);
-		// static void adopt (node_type* n, node_type* pivot);
-		// static void rotate_left (node_type* n);
-		// static void rotate_right (node_type* n);
-		// static void insert_case5 (node_type* n);
-		// static void insert_case4 (node_type* n);
-		// static void insert_case3 (node_type* n);
-		// static void insert_case2 (node_type* n);
-		// static void insert_case1 (node_type* n);
-		// static node_type* sibling (node_type* n);
-		// static void replace_node (node_type* n, node_type* child);
-		// static bool is_leaf (node_type* n);
-		// static void delete_case6 (node_type *n);
-		// static void delete_case5 (node_type *n);
-		// static void delete_case4 (node_type* n);
-		// static void delete_case3 (node_type *n);
-		// static void delete_case2 (node_type* n);
-		// static void delete_case1 (node_type* n);
-		// static void delete_one_child (node_type* n);
+    
+        node_type* grandp (node_type* n);
+		node_type* uncle (node_type* n);
+		void adopt (node_type* n, node_type* pivot);
+		void rotate_left (node_type* n);
+		void rotate_right (node_type* n);
+		void insert_case5 (node_type* n);
+		void insert_case4 (node_type* n);
+		void insert_case3 (node_type* n);
+		void insert_case2 (node_type* n);
+		void insert_case1 (node_type* n);
+		node_type* sibling (node_type* n);
+		void replace_node (node_type* n, node_type* child);
+		bool is_leaf (node_type* n);
+		void delete_case6 (node_type *n);
+		void delete_case5 (node_type *n);
+		void delete_case4 (node_type* n);
+		void delete_case3 (node_type *n);
+		void delete_case2 (node_type* n);
+		void delete_case1 (node_type* n);
+		void delete_one_child (node_type* n);
+        
     private:
         
         node_type* _new_empty_node() 
@@ -150,12 +151,11 @@ namespace ft
 					_nest = in;
 				if (!_key_cmp(in->value.first, _ground->_parent->value.first)
 				&& in->value.first != _ground->_parent->value.first)
-				{
 					_ground->_parent = in;
-					in->_right = _ground;
-				}
+                _ground->_parent->_right = _ground;
 			}
             p.first = in;
+            _size++;
             return (p);
         }
         
@@ -174,6 +174,91 @@ namespace ft
                 _n = _n->_right;
             _n->_right = _ground;
             _ground->_parent = _n;
+        }
+
+        node_type* max_left(node_type* n)
+        {
+            if (n->_right)
+                return max_left(n->_right);
+            return n;
+        }
+        
+        node_type* min_right(node_type* n)
+        {
+            if (n->_left)
+                return  min_right(n->_left);
+            return n;
+        }
+        
+        node_type* find_swch(node_type* n)
+        {
+            if (n->_left)
+                return max_left(n->_left);
+            if (n->_right)
+                return min_right(n->_right);
+            return n;
+        }
+        
+        void replace_n(node_type* n, node_type* swch)
+        {
+            node_type* tmp = _new_empty_node();
+            tmp->color = n->color;
+            tmp->_left = n->_left;
+            tmp->_right = n->_right;
+            tmp->_parent = n->_parent;
+
+            if (n->_parent)
+            {
+                if (n->_parent->_left == n)
+                    n->_parent->_left = swch;
+                else
+                    n->_parent->_right = swch;
+            }
+            if (n->_right)
+                n->_right->_parent = swch;
+            if (n->_left)
+                n->_left->_parent = swch;
+                
+            n->color = swch->color;
+            n->_left = swch->_left;
+            n->_right = swch->_right;
+            n->_parent = swch->_parent;
+            
+            if (n->_parent)
+            {
+                if (n->_parent->_left == swch)
+                    n->_parent->_left = n;
+                else
+                    n->_parent->_right = n;
+            }
+            if (n->_right)
+                n->_right->_parent = n;
+            if (n->_left)
+                n->_left->_parent = n;
+            
+            swch->color = tmp->color;
+            if (tmp->_left == swch)
+                swch->_left = n;
+            else
+                swch->_left = tmp->_left;
+            if (tmp->_right == swch)
+                swch->_right = n;
+            else
+                swch->_right = tmp->_right;
+            swch->_parent = tmp->_parent;
+            if (n == _root)
+                _root = swch;
+            if (n == _nest)
+                _nest = swch;
+            _node_alloc.deallocate(tmp,1);
+        }
+
+        void delete_n(node_type* n)
+        {
+            node_type* swch = find_swch(n);
+            if (n != swch)
+                replace_n(n, swch);
+            delete_one_child(n);
         }
         
     public:
@@ -198,29 +283,56 @@ namespace ft
         , _root(NULL)
 		, _nest(_new_empty_node())
         , _ground(_nest)
+        , _size(0)
         {
             while (first != last)
-            {
                 put_in(*first++);
-                _size++;
-            }
         }
 
         map(const map& x)
+        : allocator(x.allocator)
+        , _key_cmp(x._key_cmp)
+        , _root(NULL)
+        , _nest(_new_empty_node())
+        , _ground(_nest)
+        , _size(0)
 		{
-			
+            const_iterator it = x.begin();
+		    while (it != x.end())
+                put_in(*it++);
 		}
 
-        map& operator= (const map& x);
+        ~map()
+        {
+            while (_size--)
+                delete_n(_root);
+            _node_alloc.deallocate(_nest, 1);
+        }
+
+        map& operator= (const map& x)
+        {
+            this->~map();
+            _size = 0;
+            _nest = _new_empty_node();
+            _ground = _nest;
+            _root = NULL;
+            const_iterator it = x.begin();
+		    while (it != x.end())
+                put_in(*it++);
+            return *this;
+        }
 
         iterator begin()
         {
             // nest();
-            ground();
+            // ground();
             return(_nest);
         }
         
-        const_iterator begin() const;
+        const_iterator begin() const
+        {
+            return(reinterpret_cast<_tree_node<const value_type>*>(_nest));
+        }
         
         iterator end()
         {
@@ -229,12 +341,22 @@ namespace ft
             return(_ground);
         }
         
+        const_iterator end() const
+        {
+            // nest();
+            // ground();
+            return(reinterpret_cast<_tree_node<const value_type>*>(_ground));
+        }
+        
         iterator rend();
         const_iterator rend() const;
 
         bool empty() const;
 
-        size_type size() const;
+        size_type size() const
+        {
+            return(_size);
+        }
 
         size_type max_size() const;
 
@@ -308,296 +430,7 @@ namespace ft
         pair<const_iterator,const_iterator> equal_range (const key_type& k) const;
         
         pair<iterator,iterator>             equal_range (const key_type& k);
-
-
-    // template< class Key, class T, class Compare, class Alloc >
-	// class map;
-
-	// template< class Key, class T, class Compare, class Alloc >
-	typename map<Key,T,Compare,Alloc>::node_type*
-			grandp(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		if (n && n->_parent)
-			return n->_parent->_parent;
-		else
-			return NULL;
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	typename map<Key,T,Compare,Alloc>::node_type*
-			uncle(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* g = grandp(n);
-		if (!g)
-			return NULL;
-		if (n->_parent == g->_left)
-			return g->_right;
-		else
-			return g->_left;
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void adopt(typename map<Key,T,Compare,Alloc>::node_type* n
-				, typename map<Key,T,Compare,Alloc>::node_type* pivot)
-	{
-		pivot->_parent = n->_parent;
-        if (!pivot->_parent)
-            this->_root = pivot;
-		if(n->_parent)
-		{
-			if (n->_parent->_left == n)
-				n->_parent->_left = pivot;
-			else
-				n->_parent->_right = pivot;
-		}
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void rotate_left(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* pivot = n->_right;
-		adopt(n, pivot);
-		
-		n->_right = pivot->_left;
-		if (pivot->_left)
-			pivot->_left->_parent = n;
-		
-		n->_parent = pivot;
-		pivot->_left = n;
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void rotate_right(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* pivot = n->_left;
-		adopt(n, pivot);
-
-		n->_left = pivot->_right;
-		if (pivot->_right)
-			pivot->_right->_parent = n;
-		
-		n->_parent = pivot;
-		pivot->_right = n;
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void insert_case5(typename map<Key,T,Compare,Alloc>::node_type* n)	
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* g = grandp(n);
-		
-		n->_parent->color = BLACK;
-		g->color = RED;
-		if (n == n->_parent->_left && n->_parent == g->_left)
-			rotate_right(g);
-		else
-			rotate_left(g);
-	}
-	
-	// template< class Key, class T, class Compare, class Alloc >
-	void insert_case4(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* g = grandp(n);
-
-		if (n == n->_parent->_right && n->_parent == g->_left)
-		{
-			rotate_left(n->_parent);
-			n = n->_left;
-		}
-		else if (n == n->_parent->_left && n->_parent == g->_right)
-		{
-			rotate_right(n->_parent);
-			n = n->_right;
-		}
-		insert_case5(n);
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void insert_case3(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* u = uncle(n), *g;
-
-		if ((u != NULL) && (u->color == RED)) 
-		{
-			n->_parent->color = BLACK;
-			u->color = BLACK;
-			g = grandp(n);
-			g->color = RED;
-			insert_case1(g);
-		} 
-		else 
-			insert_case4(n);
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void insert_case2(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		if (n->_parent->color == BLACK)
-			return;
-		else
-			insert_case3(n);
-	}
-	
-	// template< class Key, class T, class Compare, class Alloc >
-	void insert_case1(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		if (n->_parent == NULL)
-			n->color = BLACK;
-		else
-			insert_case2(n);
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	typename map<Key,T,Compare,Alloc>::node_type*
-			sibling(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		if (n == n->_parent->_left)
-			return n->_parent->_right;
-		else
-			return n->_parent->_left;
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void 
-			replace_node(typename map<Key,T,Compare,Alloc>::node_type* n
-					, typename map<Key,T,Compare,Alloc>::node_type* child)
-	{
-		child->_parent = n->_parent;
-		if (n == n->_parent->_left) 
-		{
-			n->_parent->_left = child;
-		} 
-		else 
-		{
-			n->_parent->_right = child;
-		}
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	bool is_leaf(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		return (n->_left || n->_right);
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void delete_case6(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* s = sibling(n);
-
-		s->color = n->_parent->color;
-		n->_parent->color = BLACK;
-
-		if (n == n->_parent->_left) 
-		{
-			s->_right->color = BLACK;
-			rotate_left(n->_parent);
-		} 
-		else 
-		{
-			s->_left->color = BLACK;
-			rotate__right(n->_parent);
-		}
-	}
-	
-	// template< class Key, class T, class Compare, class Alloc >
-	void delete_case5(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* s = sibling(n);
-
-		if  (s->color == BLACK) 
-		{ 
-			if ((n == n->_parent->_left) &&
-				(s->_right->color == BLACK) &&
-				(s->_left->color == RED))
-			{
-				s->color = RED;
-				s->_left->color = BLACK;
-				rotate__right(s);
-			} 
-			else if ((n == n->_parent->_right) &&
-					(s->_left->color == BLACK) &&
-					(s->_right->color == RED)) 
-			{
-				s->color = RED;
-				s->_right->color = BLACK;
-				rotate_left(s);
-			}
-		}
-		delete_case6(n);
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void delete_case4(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* s = sibling(n);
-
-		if ((n->_parent->color == RED) &&
-			(s->color == BLACK) &&
-			(s->_left->color == BLACK) &&
-			(s->_right->color == BLACK)) 
-		{
-			s->color = RED;
-			n->_parent->color = BLACK;
-		} 
-		else
-				delete_case5(n);
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void delete_case3(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* s = sibling(n);
-
-		if ((n->_parent->color == BLACK) &&
-			(s->color == BLACK) &&
-			(s->_left->color == BLACK) &&
-			(s->_right->color == BLACK)) 
-		{
-			s->color = RED;
-			delete_case1(n->_parent);
-		} 
-		else
-			delete_case4(n);
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void delete_case2(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* s = sibling(n);
-
-		if (s->color == RED) 
-		{
-			n->_parent->color = RED;
-			s->color = BLACK;
-			if (n == n->_parent->_left)
-				rotate_left(n->_parent);
-			else
-				rotate_right(n->_parent);
-		} 
-		delete_case3(n);
-	}
-
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void delete_case1(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		if (n->_parent != NULL)
-			delete_case2(n);
-	}
-
-	// template< class Key, class T, class Compare, class Alloc >
-	void delete_one_child(typename map<Key,T,Compare,Alloc>::node_type* n)
-	{
-		typename map<Key,T,Compare,Alloc>::node_type* child = is_leaf(n->_right) ? n->_left : n->_right;
-		
-		replace_node(n, child);
-		if (n->color == BLACK)
-		{
-			if (child->color == RED)
-				child->color = BLACK;
-			else
-				delete_case1(child);
-		}
-		free(n);
-	}  
-    };
+	};
 }
+
+# include "b-r_tree_engine.hpp"
