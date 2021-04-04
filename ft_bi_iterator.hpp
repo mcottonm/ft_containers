@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/18 18:28:19 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/31 16:58:08 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/03 18:56:03 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,9 @@ namespace ft
 		const T* valptr() const { return &_value; }
 	};
 
+	template <typename Iter>
+	class reversBiIterator;
+	
 	template <typename T>
 	class BidirectionalIterator
 	{
@@ -51,6 +54,7 @@ namespace ft
 	
 		BidirectionalIterator(): _node() {}
 		BidirectionalIterator(const BidirectionalIterator& other): _node(other._node) {}
+		BidirectionalIterator(const reversBiIterator<BidirectionalIterator>& other): _node(reversBiIterator<BidirectionalIterator>::get_node(other)) {}
 		BidirectionalIterator(node_type* node): _node(node) {}
 		BidirectionalIterator(const_node_type* node): _node(node) {}
 		BidirectionalIterator & operator= (const BidirectionalIterator& other) { _node = other._node; return *this; }
@@ -101,6 +105,10 @@ namespace ft
 		{
 			return const_iterator<const value_type>((_list_node<const value_type>*)_node);
 		}
+		static node_type* get_node(const reversBiIterator& iterator)
+		{
+			return(iterator._node);
+		}
 		reversBiIterator & operator= (const reversBiIterator& other) { _node = other._node; return *this; }
 		reference operator*() const { return *_node->valptr(); }
 		pointer operator->() const { return _node->valptr(); }
@@ -108,8 +116,6 @@ namespace ft
       	reversBiIterator operator--(int) { reversBiIterator __tmp = *this; _node = _node->_next; return __tmp; }
 		reversBiIterator& operator++() { _node = _node->_prev; return *this; }
       	reversBiIterator operator++(int) { reversBiIterator __tmp = *this; _node = _node->_prev; return __tmp; }
-		// bool operator==(const reversBiIterator& __x) const { return _node == __x._node; }
-      	// bool operator!=(const reversBiIterator& __x) const { return _node != __x._node; }
 		friend bool operator!=(const reversBiIterator& l, const reversBiIterator& r)
 		{
 			return l._node != r._node;

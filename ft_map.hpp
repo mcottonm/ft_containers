@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 15:33:13 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/02 20:16:26 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/04 20:11:33 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 # include <iostream>
 # include <vector>
+# include <functional>
 # include "ft_map_iterator.hpp"
 
 namespace ft
@@ -29,7 +30,6 @@ namespace ft
         typedef T 											mapped_type;
         typedef pair<const key_type, mapped_type> 			value_type;
         typedef Compare 									key_compare;
-        typedef std::less<T>								value_compare;
         typedef Alloc 										allocator_type;
         typedef size_t										size_type;
         typedef value_type&									reference;
@@ -41,14 +41,35 @@ namespace ft
             rebind<node_type>::other 						node_alloc;
         typedef BiMapIterator<const value_type>				const_iterator;
         typedef BiMapIterator<value_type>					iterator;
-        // typedef reversBiIterator<const_iterator>			const_reverse_iterator;
-        // typedef reversBiIterator<iterator>					reverse_iterator;
+        typedef reversBiMapIterator<const_iterator>			const_reverse_iterator;
+        typedef reversBiMapIterator<iterator>				reverse_iterator;
         
+        class value_compare
+        : public std::binary_function<value_type, value_type, bool>
+        {
+            friend class map;
+        protected:
+            key_compare comp;
+
+            value_compare(key_compare c)
+            {
+                comp = c;
+            }
+        public:
+            bool operator()(const value_type& x, const value_type& y) const
+            {
+                return comp(x.first,y.first);
+            }
+        };
+        
+        // typedef  value_compare value_compare;
+
     private:
     
         allocator_type										allocator;
         node_alloc											_node_alloc;
         key_compare											_key_cmp;
+        value_compare                                       _value_cmp;
         node_type*											_root;
         node_type*                                          _nest;
         node_type*											_ground;
@@ -130,7 +151,7 @@ namespace ft
             return true;
         }
         
-        pair<iterator,bool> put_in(const value_type& val)
+        pair<iterator,bool> put_in(const value_type& val, node_type* root)
         {
             pair<iterator,bool> p;
             node_type* in = _new_node(val);
@@ -146,16 +167,24 @@ namespace ft
             else
 			{
 				_ground->_parent->_right = NULL;
-                p.second = insert_n(_root, in);
-				if (_key_cmp(in->value.first, _nest->value.first))
-					_nest = in;
-				if (!_key_cmp(in->value.first, _ground->_parent->value.first)
-				&& in->value.first != _ground->_parent->value.first)
-					_ground->_parent = in;
+                if ((p.second = insert_n(root, in)))
+                {
+                    if (_key_cmp(in->value.first, _nest->value.first))
+                        _nest = in;
+                    if (!_key_cmp(in->value.first, _ground->_parent->value.first)
+                    && in->value.first != _ground->_parent->value.first)
+                        _ground->_parent = in;
+                }
+                else
+                {
+                    allocator.destroy(&in->value);
+                    _node_alloc.deallocate(in,1);
+                }
                 _ground->_parent->_right = _ground;
 			}
             p.first = in;
-            _size++;
+            if (p.second)
+                _size++;
             return (p);
         }
         
@@ -271,6 +300,7 @@ namespace ft
 		, _nest(_new_empty_node())
         , _ground(_nest)
         , _size(0)
+        , _value_cmp(_key_cmp)
         {
         }
 
@@ -284,9 +314,10 @@ namespace ft
 		, _nest(_new_empty_node())
         , _ground(_nest)
         , _size(0)
+        , _value_cmp(_key_cmp)
         {
             while (first != last)
-                put_in(*first++);
+                put_in(*first++, _root);
         }
 
         map(const map& x)
@@ -296,10 +327,11 @@ namespace ft
         , _nest(_new_empty_node())
         , _ground(_nest)
         , _size(0)
+        , _value_cmp(x._value_cmp)
 		{
             const_iterator it = x.begin();
 		    while (it != x.end())
-                put_in(*it++);
+                put_in(*it++, _root);
 		}
 
         ~map()
@@ -318,7 +350,7 @@ namespace ft
             _root = NULL;
             const_iterator it = x.begin();
 		    while (it != x.end())
-                put_in(*it++);
+                put_in(*it++, _root);
             return *this;
         }
 
@@ -348,62 +380,152 @@ namespace ft
             return(reinterpret_cast<_tree_node<const value_type>*>(_ground));
         }
         
-        iterator rend();
-        const_iterator rend() const;
+        reverse_iterator rbegin()
+        {
+            if (_ground->_parent)
+                return reverse_iterator(_ground->_parent);
+            return reverse_iterator(_ground);
+        }
 
-        bool empty() const;
+        const_reverse_iterator rbegin() const
+        {
+            if (_ground->_parent)
+                return const_reverse_iterator(_ground->_parent);
+            return const_reverse_iterator(_ground);
+        }
+        
+        reverse_iterator rend()
+        {
+            return reverse_iterator(_nest);
+        }
+        
+        const_reverse_iterator rend() const
+        {
+            return const_reverse_iterator(_nest);
+        }
+
+        bool empty() const
+        {
+            return(_size);
+        }
 
         size_type size() const
         {
             return(_size);
         }
 
-        size_type max_size() const;
+        size_type max_size() const
+        {
+            return(_node_alloc.max_size());
+        }
 
-        mapped_type& operator[] (const key_type& k);
+        mapped_type& operator[] (const key_type& k)
+        {
+            node_type* _n = finder(_root, k);
+            return(_n->value.second);
+        }
 
         pair<iterator,bool> insert (const value_type& val)
         {
-            return(put_in(val));
+            return(put_in(val, _root));
         }
 
 
-        iterator insert (iterator position, const value_type& val);
+        iterator insert (iterator position, const value_type& val)
+        {
+            return put_in(val, iterator::get_node(position)).first;
+        }
         
-        template <class InputIterator>
-        void insert (InputIterator first, InputIterator last);
+        template <typename _Val, template <typename> class _Iter>
+        void insert (_Iter<_Val> first, _Iter<_Val> last)
+        {
+            while (first != last)
+                put_in(*(first++), _root);
+        }
         
-        void erase (iterator position);
+        void erase (iterator position)
+        {
+            delete_n(iterator::get_node(position));
+            --_size;
+        }
 
-        size_type erase (const key_type& k);
+        size_type erase (const key_type& k)
+        {
+            node_type* _n = finder(_root, k);
+            if (_n != _ground)
+                delete_n(_n);
+            else
+                return 0;
+            --_size;
+            return 1;
+        }
 
-        void erase (iterator first, iterator last);
+        void erase (iterator first, iterator last)
+        {
+            while (first != last)
+                delete_n(*(first++));
+        }
 
-        void swap (map& x);
+        void swap (map& x)
+        {
+            allocator_type										tmp_allocator = allocator;
+            node_alloc											tmp_node_alloc = _node_alloc;
+            key_compare											tmp_key_cmp = _key_cmp;
+            node_type*											tmp_root = _root;
+            node_type*                                          tmp_nest = _nest;
+            node_type*											tmp_ground = _ground;
+            size_type                                           tmp_size = _size;
+
+            allocator = x.allocator;
+            _node_alloc = x._node_alloc;
+            _key_cmp = x._key_cmp;
+            _root = x._root;
+            _nest = x._nest;
+            _ground = x._ground;
+            _size = x._size;
+            
+            x.allocator = tmp_allocator;
+            x._node_alloc = tmp_node_alloc;
+            x._key_cmp = tmp_key_cmp;
+            x._root = tmp_root;
+            x._nest = tmp_nest;
+            x._ground = tmp_ground;
+            x._size = tmp_size;
+        }
         
-        void clear();
+        void clear()
+        {
+            for(;_size > 0; _size--)
+                delete_n(_root);
+        }
 
-        key_compare key_comp() const;
+        key_compare key_comp() const
+        {
+            return _key_cmp;
+        }
 
-        value_compare value_comp() const;
+        value_compare value_comp() const
+        {
+           return _value_cmp;
+        }
 
 	private:
 	    
         node_type* finder(node_type* _n, const key_type& k)
         {
-            if (_n->value.key == k)
+            if (_n->value.first == k)
                 return (_n);
-            else if (_key_cmp(_n->value.key, k))
-            {
-                if (!_n->left)
-                    return(_ground);
-                return (finder(_n->_left, k));
-            }
-            else
+            else if (_key_cmp(_n->value.first, k))
             {
                 if (!_n->_right)
                     return(_ground);
                 return (finder(_n->_right, k));
+            }
+            else
+            {
+                if (!_n->_left)
+                    return(_ground);
+                return (finder(_n->_left, k));
             }
         }
 		
@@ -411,8 +533,7 @@ namespace ft
 	 
         iterator find (const key_type& k)
         {
-            node_type* _n = _root;
-            return(iterator(finder(_n, k)));
+            return(iterator(finder(_root, k)));
         }
         
         const_iterator find (const key_type& k) const;

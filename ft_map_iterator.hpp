@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 15:38:25 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/02 15:22:49 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/03 14:40:03 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,15 +107,16 @@ namespace ft
 		
 	private:
 		node_type*					_node;
-		
-		node_type* iter_finder1(node_type* _n)
+
+	public:	
+		static node_type* iter_finder1(node_type* _n)
         {
             if (_n->_left)
                 return iter_finder1(_n->_left);
             return _n;
         }
 
-        node_type* iter_finder2(node_type* _n)
+        static node_type* iter_finder2(node_type* _n)
         {
             if (_n->_parent && _n->_parent->_left == _n)
                 return(_n->_parent);
@@ -124,21 +125,21 @@ namespace ft
             return _n;
         }
 
-        node_type* iter_finder(node_type* _n)
+        static node_type* iter_finder(node_type* _n)
         {
             if (_n->_right)
                 return iter_finder1(_n->_right);
             return iter_finder2(_n);
         }
 
-		node_type* iter_finder1_rev(node_type* _n)
+		static node_type* iter_finder1_rev(node_type* _n)
         {
             if (_n->_right)
                 return iter_finder1_rev(_n->_right);
             return _n;
         }
 		
-		node_type* iter_finder2_rev(node_type* _n)
+		static node_type* iter_finder2_rev(node_type* _n)
         {
             if (_n->_parent && _n->_parent->_right == _n)
                 return(_n->_parent);
@@ -147,7 +148,7 @@ namespace ft
             return _n;
         }
 		
-		node_type* iter_finder_rev(node_type* _n)
+		static node_type* iter_finder_rev(node_type* _n)
 		{
 			if (_n->_left)
 				return iter_finder1_rev(_n->_left);
@@ -181,5 +182,47 @@ namespace ft
       	self_type operator--(int) { self_type __tmp = *this; _node = iter_finder_rev(_node); return __tmp; }
 		bool operator==(const self_type& __x) const { return _node == __x._node; }
       	bool operator!=(const self_type& __x) const { return _node != __x._node; }
+	};
+
+	template <typename Iter>
+	class reversBiMapIterator
+	{
+		typedef typename Iter::self_type		self_type;
+		typedef typename Iter::value_type		value_type;
+		typedef typename Iter::difference_type  difference_type;
+		typedef typename Iter::pointer			pointer;
+		typedef typename Iter::reference		reference;
+		typedef typename Iter::node_type		node_type;
+		typedef typename Iter::const_node_type		const_node_type;
+
+	private:
+		node_type*					_node;	
+	public:
+	
+		reversBiMapIterator(): _node() {}
+		reversBiMapIterator(const reversBiMapIterator& other): _node(other._node) {}
+		reversBiMapIterator(node_type* node): _node(node) {}
+		reversBiMapIterator(const_node_type* node): _node(node) {}
+		reversBiMapIterator & operator= (const reversBiMapIterator& other) { _node = other._node; return *this; }
+		
+		template <template <typename> class const_iterator>
+		operator const_iterator<const value_type>()
+		{
+			return const_iterator<const value_type >((_tree_node<const value_type>*)_node);
+		}
+
+		static node_type* get_node(const reversBiMapIterator& iterator)
+		{
+			return(iterator._node);
+		}
+
+		reference operator*() const { return *&_node->value; }
+		pointer operator->() const { return &_node->value; }
+		reversBiMapIterator& operator++() { _node = Iter::iter_finder_rev(_node); return *this; }
+      	reversBiMapIterator operator++(int) { reversBiMapIterator __tmp = *this; _node = Iter::iter_finder_rev(_node); return __tmp; }
+		reversBiMapIterator& operator--() { _node = Iter::iter_finder(_node); return *this; }
+      	reversBiMapIterator operator--(int) { reversBiMapIterator __tmp = *this; _node = Iter::iter_finder(_node); return __tmp; }
+		bool operator==(const reversBiMapIterator& __x) const { return _node == __x._node; }
+      	bool operator!=(const reversBiMapIterator& __x) const { return _node != __x._node; }		
 	};
 }

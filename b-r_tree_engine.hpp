@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/28 16:41:41 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/02 20:28:27 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/03 21:43:21 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,10 +159,14 @@ namespace ft
 	typename map<Key,T,Compare,Alloc>::node_type*
 			map<Key,T,Compare,Alloc>::sibling(typename map<Key,T,Compare,Alloc>::node_type* n)
 	{
-		if (n == n->_parent->_left)
-			return n->_parent->_right;
-		else
-			return n->_parent->_left;
+		if (n->_parent)
+		{
+			if (n == n->_parent->_left)
+				return n->_parent->_right;
+			else
+				return n->_parent->_left;
+		}
+		return NULL;
 	}
 
 	template< class Key, class T, class Compare, class Alloc >
@@ -249,7 +253,7 @@ namespace ft
 			n->_parent->color = BLACK;
 		} 
 		else
-				delete_case5(n);
+			delete_case5(n);
 	}
 
 	template< class Key, class T, class Compare, class Alloc >
@@ -276,7 +280,7 @@ namespace ft
 	{
 		typename map<Key,T,Compare,Alloc>::node_type* s = sibling(n);
 
-		if (s->color == RED) 
+		if (s->color == RED)
 		{
 			n->_parent->color = RED;
 			s->color = BLACK;
@@ -284,7 +288,7 @@ namespace ft
 				rotate_left(n->_parent);
 			else
 				rotate_right(n->_parent);
-		} 
+		}
 		delete_case3(n);
 	}
 
@@ -293,7 +297,9 @@ namespace ft
 	void map<Key,T,Compare,Alloc>::delete_case1(typename map<Key,T,Compare,Alloc>::node_type* n)
 	{
 		if (n->_parent != NULL)
+		{
 			delete_case2(n);
+		}
 	}
 
 	template< class Key, class T, class Compare, class Alloc >
@@ -316,7 +322,11 @@ namespace ft
 		}
 		else
 		{
-			if (n->color == BLACK)
+			typename map<Key,T,Compare,Alloc>::node_type* s = sibling(n);
+			// bool kostil = (s && s->color == BLACK);
+			if (!s && n->_parent && n->_parent->color == RED && n->color == BLACK)
+				n->_parent->color = BLACK;
+			else if (n->color == BLACK)
 				delete_case1(n);
 			if (n->_parent)
 			{
