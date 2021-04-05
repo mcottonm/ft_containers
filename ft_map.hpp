@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_map.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 15:33:13 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/04 20:11:33 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/05 16:10:21 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -536,21 +536,75 @@ namespace ft
             return(iterator(finder(_root, k)));
         }
         
-        const_iterator find (const key_type& k) const;
+        const_iterator find (const key_type& k) const
+        {
+            return(const_iterator(finder(_root, k)));
+        }
 
-        size_type count (const key_type& k) const;
+        size_type count (const key_type& k) const
+        {
+            if (finder(_root, k) == _ground)
+                return 0;
+            return 1;
+        }
 
-        iterator lower_bound (const key_type& k);
+    private:
+    
+        node_type* find_lower_bound(node_type* _n, const key_type& k)
+        {
+            if (_key_cmp(k, _n->value.first))
+            {
+                if (!_n->_right)
+                    return _ground;
+                return find_lower_bound(_n->_right, k);
+            }
+            else
+                return _n;
+        }
+
+        node_type* find_upper_bound(node_type* _n, const key_type& k)
+        {
+            if (_key_cmp(k, _n->value.first))
+            {
+                if (!_n->_left)
+                    return _ground;
+                return find_upper_bound(_n->_left, k);
+            }
+            else
+                return _n;
+        }
         
-        const_iterator lower_bound (const key_type& k) const;
-
-        iterator upper_bound (const key_type& k);
+    public:
         
-        const_iterator upper_bound (const key_type& k) const;
+        iterator lower_bound (const key_type& k)
+        {
+            return iterator(find_lower_bound(_root, k));
+        }
+        
+        const_iterator lower_bound (const key_type& k) const
+        {
+            return const_iterator(find_lower_bound(_root, k));
+        }
 
-        pair<const_iterator,const_iterator> equal_range (const key_type& k) const;
+        iterator upper_bound (const key_type& k)
+        {
+            return iterator(find_upper_bound(_root, k));
+        }
+        
+        const_iterator upper_bound (const key_type& k) const
+        {
+            return const_iterator(find_upper_bound(_root, k));
+        }
+
+        pair<const_iterator,const_iterator> equal_range (const key_type& k) const
+        {
+            return pair<lower_bound(k), upper_bound(k)>; 
+        }
         
         pair<iterator,iterator>             equal_range (const key_type& k);
+        {
+            return pair<lower_bound(k), upper_bound(k)>;
+        }
 	};
 }
 
