@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:34:34 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/04 20:11:57 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/06 18:05:37 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,30 +75,34 @@ void foo()
 	ft::pair<int, int> i7(1,88);
 	ft::pair<int,int> out1;
 	ft::map<int, int> l;
-	// ft::pair<ft::map<int,int>::iterator, bool> out;
+	ft::pair<ft::map<int,int>::iterator, bool> out;
 	
-	// l.insert(i1);
-	// l.insert(i2);
-	// l.insert(i3);
-	// l.insert(i4);
-	// out = l.insert(i5);
-	// ft::map<int, int> t(l);
-	// t.insert(i5);
-	// t.insert(i6);
-	// // j = t;
-	// std::map<int,int>::iterator it = j.begin();
-	// // std::cout << (*(out.first)).first << std::endl;
-	// // std::cout << l.size() << std::endl;
-	// // it++++++;
-	// it = j.insert(++it,i7);
-	// l.insert(j.begin(), j.end());
-	// l.swap(j);
-	// std::cout << (*(++it)).first << std::endl;
-	// std::cout << (*(it)).second << std::endl;
-	// l.erase(l.begin(), l.end());
+	l.insert(i1);
+	l.insert(i2);
+	l.insert(i3);
+	l.insert(i4);
+	out = l.insert(i5);
+	ft::map<int, int> t(l);
+	ft::map<int, int> j;
+	t.insert(i5);
+	t.insert(i6);
+	j = t;
+	ft::map<int,int>::iterator it = j.begin();
+	// std::cout << (*(out.first)).first << std::endl;
+	// std::cout << l.size() << std::endl;
+	// it++++++;
+	it = j.insert(++it,i7);
+	l.insert(j.begin(), j.end());
+	l.swap(j);
+	std::cout << (*(++it)).first << std::endl;
+	std::cout << (*(it)).second << std::endl;
+	l.erase(l.begin(), l.end());
 	printf("%d\n", l.value_comp()(i3,i2));
-	// tree_node* y = 0;
-
+	ft::pair<ft::map<int,int>::iterator,ft::map<int,int>::iterator> eq = t.equal_range(3);
+	it = t.upper_bound(1);
+	std::cout << (*(eq.first)).first << std::endl;
+	std::cout << (*(eq.second)).first << std::endl;
+	std::cout << (*(it)).first << std::endl;
 	// for(int i = 0; i < 9; i++)
 	// {
 	// 	if (!y)

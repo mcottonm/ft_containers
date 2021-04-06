@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_map.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 15:33:13 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/05 16:10:21 by marvin           ###   ########.fr       */
+/*   Updated: 2021/04/06 18:04:58 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,18 @@
 
 namespace ft
 {
+    template <typename K>
+    class less
+    {
+    public:
+        bool operator()(const K& _x, const K& _y) const
+        {
+            return (_x < _y);
+        }
+    };
+
     template < class Key, class T,
-           class Compare = std::less<Key>,
+           class Compare = less<Key>,
            class Alloc = std::allocator<pair<const Key,T> > >
     class map
     {
@@ -45,9 +55,9 @@ namespace ft
         typedef reversBiMapIterator<iterator>				reverse_iterator;
         
         class value_compare
-        : public std::binary_function<value_type, value_type, bool>
         {
             friend class map;
+
         protected:
             key_compare comp;
 
@@ -55,14 +65,13 @@ namespace ft
             {
                 comp = c;
             }
+
         public:
             bool operator()(const value_type& x, const value_type& y) const
             {
                 return comp(x.first,y.first);
             }
         };
-        
-        // typedef  value_compare value_compare;
 
     private:
     
@@ -287,7 +296,10 @@ namespace ft
             node_type* swch = find_swch(n);
             if (n != swch)
                 replace_n(n, swch);
+            else if (n == _nest && n->_parent)
+                _nest = n->_parent;
             delete_one_child(n);
+            --_size;
         }
         
     public:
@@ -336,7 +348,7 @@ namespace ft
 
         ~map()
         {
-            while (_size--)
+            while (_size)
                 delete_n(_root);
             _node_alloc.deallocate(_nest, 1);
         }
@@ -463,7 +475,7 @@ namespace ft
         void erase (iterator first, iterator last)
         {
             while (first != last)
-                delete_n(*(first++));
+                delete_n(iterator::get_node(first++));
         }
 
         void swap (map& x)
@@ -550,60 +562,49 @@ namespace ft
 
     private:
     
-        node_type* find_lower_bound(node_type* _n, const key_type& k)
-        {
-            if (_key_cmp(k, _n->value.first))
-            {
-                if (!_n->_right)
-                    return _ground;
-                return find_lower_bound(_n->_right, k);
-            }
-            else
-                return _n;
-        }
-
-        node_type* find_upper_bound(node_type* _n, const key_type& k)
-        {
-            if (_key_cmp(k, _n->value.first))
-            {
-                if (!_n->_left)
-                    return _ground;
-                return find_upper_bound(_n->_left, k);
-            }
-            else
-                return _n;
-        }
         
     public:
         
         iterator lower_bound (const key_type& k)
         {
-            return iterator(find_lower_bound(_root, k));
+            iterator it = begin();
+            while(_key_cmp((*it).first, k) && it != end())
+                ++it;
+            return it;
         }
         
         const_iterator lower_bound (const key_type& k) const
         {
-            return const_iterator(find_lower_bound(_root, k));
+            const_iterator it = begin();
+            while(_key_cmp((*it).first, k) && it != end())
+                ++it;
+            return it;
         }
 
         iterator upper_bound (const key_type& k)
         {
-            return iterator(find_upper_bound(_root, k));
+            iterator it = begin();
+            while(!_key_cmp(k, (*it).first) && it != end())
+                ++it;
+            return it;
         }
         
         const_iterator upper_bound (const key_type& k) const
         {
-            return const_iterator(find_upper_bound(_root, k));
+            const_iterator it = begin();
+            while(!_key_cmp(k, (*it).first) && it != end())
+                ++it;
+            return it;
         }
 
         pair<const_iterator,const_iterator> equal_range (const key_type& k) const
         {
-            return pair<lower_bound(k), upper_bound(k)>; 
+            return pair<const_iterator, const_iterator>(lower_bound(k), upper_bound(k)); 
         }
         
-        pair<iterator,iterator>             equal_range (const key_type& k);
+        pair<iterator,iterator>             equal_range (const key_type& k)
         {
-            return pair<lower_bound(k), upper_bound(k)>;
+            return pair<iterator, iterator>(lower_bound(k), upper_bound(k));
         }
 	};
 }
