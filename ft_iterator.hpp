@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/11 18:11:24 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/29 16:11:54 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/07 17:15:01 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,11 @@ namespace ft
 		reverseIterator(const reverseIterator& other): ptr(other.ptr) {}
 		reverseIterator(const pointer other): ptr(other) {}
 		virtual ~reverseIterator() {}
+		
+		pointer base() const
+		{
+			return(ptr);
+		}
 		
 		template <template <typename> class const_iterator>
 		operator const_iterator<const value_type>() 

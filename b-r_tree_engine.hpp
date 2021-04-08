@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/28 16:41:41 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/03 21:43:21 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/07 14:49:22 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,7 +323,6 @@ namespace ft
 		else
 		{
 			typename map<Key,T,Compare,Alloc>::node_type* s = sibling(n);
-			// bool kostil = (s && s->color == BLACK);
 			if (!s && n->_parent && n->_parent->color == RED && n->color == BLACK)
 				n->_parent->color = BLACK;
 			else if (n->color == BLACK)
