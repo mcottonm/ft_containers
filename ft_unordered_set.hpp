@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/06 18:12:07 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/08 19:46:33 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/10 15:19:18 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,31 @@
 
 # include <iostream>
 # include <unordered_map>
+# include <algorithm>
 # include "forward_iterator.hpp"
 
 namespace ft
 {
+	int HashFunctionHorner(const std::string& s)
+	{
+		int hash_result = 0;
+		for (int i = 0; i != s.size(); ++i)
+			hash_result = ((std::numeric_limits<int>::max() - 1) * hash_result + s[i]) % std::numeric_limits<int>::max();
+		hash_result = (hash_result * 2 + 1);
+		return hash_result;
+	}
+		
+	class func
+	{
+	public:
+		int operator()(const std::string& s) const
+		{
+			return HashFunctionHorner(s);
+		}
+	};
+	
 	template < class Key,
-           class Hash = std::hash<Key>,
+           class Hash = func,
            class Pred = std::equal_to<Key>,
            class Alloc = std::allocator<Key>
            > 
@@ -49,8 +68,9 @@ namespace ft
 		node_alloc		n_alloc;
 		hash_alloc		hsss_alloc;
 		size_type		_size;
-		size_type		bucket_count;
+		size_type		_bucket_count;
 		node_type**		_cashT;
+		node_type*		_last;
 		hasher			hsss;
 		key_equal		eq;
 		
@@ -85,73 +105,70 @@ namespace ft
 		
 	public:
 	
-		explicit unordered_set ( size_type n = 8,
+		explicit unordered_set ( size_type n = 0,
 							const hasher& hf = hasher(),
 							const key_equal& eql = key_equal(),
 							const allocator_type& alloc = allocator_type() )
 		: allocator(alloc)
 		, _size(0)
-		, bucket_count(n)
+		, _bucket_count(n)
 		, _cashT(hsss_alloc.allocate(n))
+		, _last(NULL)
 		, hsss(hf)
 		{
-			for(size_type i = 0; i < bucket_count; ++i)
+			for(size_type i = 0; i < _bucket_count; ++i)
 				_cashT[i] = NULL;
 		}
 		
 		~unordered_set()
 		{
-			for(size_type i = 0; i < bucket_count; ++i)
+			while (_last)
 			{
-				for(node_type* tmp = _cashT[i]; tmp; _cashT[i] = tmp)
-				{
-					tmp = tmp->next;
-					allocator.destroy(&_cashT[i]->value);
-					n_alloc.deallocate(_cashT[i], 1);
-				}
+				node_type* tmp = _last;
+				_last = _last->next;
+				allocator.destroy(&tmp->value);
+				n_alloc.deallocate(tmp, 1);
 			}
-			hsss_alloc.deallocate(_cashT, bucket_count);
+			hsss_alloc.deallocate(_cashT, _bucket_count);
 		}
 
 		void rehash(size_type n)
 		{
-			if (bucket_count >= n)
+			if (_bucket_count >= n)
 				return ;
-			size_type new_count = bucket_count * 2 < n ? n : bucket_count * 2;
+			size_type new_count = _bucket_count * 2 < n ? n : _bucket_count * 2;
 			node_type** new_cashT = hsss_alloc.allocate(new_count);
 			for (size_type i = 0; i < new_count; ++i)
 				new_cashT[i] = NULL;
-			for (size_type i = 0; i < bucket_count; ++i)
+			node_type* tmp = _last;
+			while(tmp)
 			{
-				while(_cashT[i])
-				{
-					node_type* tmp = _cashT[i];
-					size_type j = constrain_hash(hsss(_cashT[i]->value), new_count);
-					push_back(&new_cashT[j], _cashT[i]);
-					n_alloc.deallocate(_cashT[i], 1);
-					_cashT[i] = tmp->next;
-				}
+				size_type j = constrain_hash(hsss(tmp->value), new_count);
+				new_cashT[j] = tmp;
+				tmp = tmp->next;
 			}
-			hsss_alloc.deallocate(_cashT, bucket_count);
+			hsss_alloc.deallocate(_cashT, _bucket_count);
 			_cashT = new_cashT;
-			bucket_count = new_count;
+			_bucket_count = new_count;
 		}
 
-		bool Add(const value_type& value)
+		bool insert(const value_type& value)
 		{
-			if (_size + 1 >= bucket_count)
-				rehash(bucket_count * 2);
-			size_type i = constrain_hash(hsss(value), bucket_count);
+			if (_size + 1 >= _bucket_count)
+				rehash(_bucket_count + 1);
+			size_type i = constrain_hash(hsss(value), _bucket_count);
+			std::cout << value << " " << i <<std::endl;
 			node_type* tmp = _cashT[i];
 			if (tmp)
 			{
-				for(;tmp->next; tmp = tmp->next)
+				for(;tmp->next && constrain_hash(hsss(tmp->next->value), _bucket_count) == i; tmp = tmp->next)
 					if (eq(tmp->value,value))
 						return false;
 				if (eq(tmp->value,value))
 						return false;
 				node_type* n = new_node();
 				allocator.construct(&n->value, value);
+				n->next = tmp->next;
 				tmp->next = n;
 			}
 			else
@@ -159,17 +176,27 @@ namespace ft
 				node_type* n = new_node();
 				allocator.construct(&n->value, value);
 				_cashT[i] = n;
+				n->next = _last;
+				_last = n;
 			}
 			++_size;
 			return true;
 		}
 
+		
 		iterator begin()
 		{
-			size_type i = 0;
-			while (!_cashT[i])
-				++i;
-			return(iterator(&_cashT[i], _cashT[i]));
-		}		
+			return(_last);
+		}
+
+		size_type size() const
+		{
+			return _size;
+		}
+
+		size_type bucket_count() const
+		{
+			return _bucket_count;
+		}
 	};
 }

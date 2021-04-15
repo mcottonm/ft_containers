@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 20:37:27 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/06 16:02:24 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/14 15:59:17 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,6 @@
 
 namespace ft
 {
-
-	// template <bool expr, typename T = void>
-	// struct bubka {};
-
-	// template <typename T>
-	// struct bubka<true, T> { typedef T type; };
-
 	template <class T, class Allocator=std::allocator<T> >
 	class list
 	{
@@ -50,9 +43,9 @@ namespace ft
 		
 	private:
 		allocator_type	allocator;
-		size_type		_size;
 		node_type*		_head;
 		node_type*		_tail;
+		size_type		_size;
 		node_alloc		_node_alloc;
 
 	private:
@@ -187,6 +180,8 @@ namespace ft
 
 		list& operator=(const list& other)
 		{
+			if (this == &other)
+				return *this;
 			this->~list();
 			allocator = other.allocator;
 			init();
@@ -200,7 +195,7 @@ namespace ft
 				_node_add_back(new_node);
 				cped_node = cped_node->_next;
 			}
-			return(*this);
+			return *this;
 		}
 		
 		template <typename _Val, template <typename> class _Iter>
@@ -232,10 +227,10 @@ namespace ft
 		const_iterator end() const { return reinterpret_cast<_list_node<const value_type>*>(_tail); }
 
 		reverse_iterator rbegin() { return reverse_iterator(!_size ? _tail : _tail->_prev); }
-		reverse_iterator rend() { return _tail; }
+		reverse_iterator rend() { return reverse_iterator(_tail); }
 
 		const_reverse_iterator rbegin() const { return const_reverse_iterator(!_size ? _tail : _tail->_prev); }
-		const_reverse_iterator rend() const { return _tail; }
+		const_reverse_iterator rend() const { return const_reverse_iterator(_tail); }
 
 //element access:
 		reference front()
@@ -514,18 +509,12 @@ namespace ft
 			*head = sorted(a, b, comp);
 		}
 
-		void avsb(node_type** a, node_type** b, node_type **c)
+		void avsb(node_type** a, node_type **c)
 		{
-			node_type* tmpa = (*a)->_next;
-			node_type* tmpb = (*b)->_next;
-
-			(*c)->_next = (*a);
-			(*a)->_prev = (*c);
-			(*a)->_next = (*b);
-			(*b)->_prev = (*a);
-			(*c) = (*b);
-			*a = tmpa;
-			*b = tmpb;
+			(*c)->_next = *a;
+			(*a)->_prev = *c;
+			*a = (*a)->_next;
+			*c = (*c)->_next;
 		}
 
 	public:
@@ -533,7 +522,7 @@ namespace ft
 		template <class Compare>
 		void merge(list& other, Compare comp)
 		{
-			if (other._head == _head)
+			if (this == &other)
 				return ;
 			_size += other._size;
 			node_type* new_list = _tail;
@@ -541,12 +530,10 @@ namespace ft
 			while (_head != _tail && other._head != other._tail)
 			{
 				if (comp(_head->_value, other._head->_value))
-					avsb(&_head, &(other._head), &new_list);
+					avsb(&_head, &new_list);
 				else
-					avsb(&(other._head), &_head, &new_list);
-				new_list->_next = _head;
+					avsb(&(other._head), &new_list);
 			}
-			_head = _tail->_next;
 			if (other._head != other._tail)
 			{
 				new_list->_next = other._head;
@@ -554,6 +541,9 @@ namespace ft
 				other._tail->_prev->_next = _tail;
 				_tail->_prev = other._tail->_prev;
 			}
+			else
+				new_list->_next = _head;
+			_head = _tail->_next;
 			other._tail->_next = other._tail;
 			other._tail->_prev = other._tail;
 			other._head = other._tail;
@@ -631,13 +621,14 @@ namespace ft
 		template <class Compare>
   		void sort (Compare comp)
 		{
-			node_type* tmp = _head;
 			_merge_sort(&_head, comp);
+			node_type* tmp = _head;
 			while (tmp != _tail)
 			{
 				tmp->_next->_prev = tmp;
 				tmp = tmp->_next;
 			}
+			_tail->_next = _head;
 		}
 
 		void reverse()
@@ -645,26 +636,12 @@ namespace ft
 			list<value_type> a;
 			
 			iterator it = end();
-			while (--it != end())
-				a.push_back(*it);
+			while (it != begin())
+				a.push_back(*--it);
 			this->~list();
 			init();
 			merge(a);
 		}
-		
-//relational operators:
-
-		// friend bool operator==(const list& lhs, const list& rhs)
-		// {
-		// 	const_iterator first_l = lhs.begin();
-		// 	const_iterator first_r = rhs.begin();
-		
-		// 	for (; (first_l != lhs.end()) && (first_r != rhs.end()); ++first_l, (void) ++first_r ) {
-		// 		if (*first_l < *first_r) return true;
-		// 		if (*first_r < *first_l) return false;
-		// 	}
-		// 	return (first_l != lhs.end()) && (first_r == rhs.end());
-		// }
 
 	};
 

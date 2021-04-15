@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/07 14:49:47 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/08 19:48:04 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/09 18:19:41 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,15 @@ namespace ft
 		typedef const Node<const value_type> const_node_type;
 		
 	private:
-		node_type**					_cashT;
 		node_type*                  _node;
 	public:
 	
-		FIterator(): _node(), _cashT() {}
-		FIterator(const FIterator& other): _node(other._node), _cashT(other._cashT) {}
+		FIterator(): _node() {}
+		FIterator(const FIterator& other): _node(other._node) {}
 		//FIterator(const reversBiIterator<FIterator>& other): _node(reversBiIterator<FIterator>::get_node(other)) {}
-		FIterator(node_type** cashT, node_type* node): _cashT(cashT), _node(node) {}
-		FIterator(const_node_type** cashT, const_node_type* node): _cashT(cashT), _node(node) {}
-		FIterator & operator= (const FIterator& other) { _cashT = other._cashT; _node = other._node; return *this; }
+		FIterator(node_type* node): _node(node) {}
+		FIterator(const_node_type* node): _node(node) {}
+		FIterator & operator= (const FIterator& other) { _node = other._node; return *this; }
 		
 		template <template <typename> class const_iterator>
 		operator const_iterator<const value_type>()
@@ -64,27 +63,13 @@ namespace ft
 		pointer operator->() const { return *_node->value; }
 		self_type& operator++()
         {
-            if (!_node->next)
-            {
-                while (!*++_cashT)
-                    ;
-                _node = *_cashT;
-            }
-            else
-                _node = _node->next;
+            _node = _node->next;
             return *this;
         }
       	self_type operator++(int) 
         {
             self_type __tmp = *this; 
-            if (!_node->next)
-            {
-                while (!*++_cashT)
-                    ;
-                _node = *_cashT;
-            }
-            else
-                _node = _node->next;
+            _node = _node->next;
             return __tmp;
         }
 		bool operator==(const self_type& __x) const { return _node == __x._node; }

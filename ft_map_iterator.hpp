@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 15:38:25 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/03 14:40:03 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/14 16:06:53 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@
 
 namespace ft
 {	
+	template <class _Tp> struct remove_const            {typedef _Tp type;};
+	template <class _Tp> struct remove_const<const _Tp> {typedef _Tp type;};
+		
 	template< class Key, class T, class Compare, class Alloc >
 	class map;
 	
@@ -155,6 +158,7 @@ namespace ft
 			return iter_finder2_rev(_n);
 		}
 		
+		
 	public:
 	
 		BiMapIterator(): _node() {}
@@ -169,6 +173,12 @@ namespace ft
 			return const_iterator<const value_type >((_tree_node<const value_type>*)_node);
 		}
 
+		template <template <typename> class iterator>
+		operator iterator<typename remove_const<value_type>::type>()
+		{
+			return iterator<typename remove_const<value_type>::type>((_tree_node<typename remove_const<value_type>::type>*)_node);
+		}
+		
 		static node_type* get_node(const BiMapIterator& iterator)
 		{
 			return(iterator._node);
@@ -197,9 +207,11 @@ namespace ft
 
 	private:
 		node_type*					_node;	
+
 	public:
 	
 		reversBiMapIterator(): _node() {}
+		reversBiMapIterator(const Iter& other): _node(Iter::get_node(other)) {}
 		reversBiMapIterator(const reversBiMapIterator& other): _node(other._node) {}
 		reversBiMapIterator(node_type* node): _node(node) {}
 		reversBiMapIterator(const_node_type* node): _node(node) {}
@@ -209,6 +221,12 @@ namespace ft
 		operator const_iterator<const value_type>()
 		{
 			return const_iterator<const value_type >((_tree_node<const value_type>*)_node);
+		}
+		
+		template <template <typename> class iterator>
+		operator iterator<typename remove_const<value_type>::type>()
+		{
+			return iterator<typename remove_const<value_type>::type>((_tree_node<typename remove_const<value_type>::type>*)_node);
 		}
 
 		static node_type* get_node(const reversBiMapIterator& iterator)
@@ -222,7 +240,14 @@ namespace ft
       	reversBiMapIterator operator++(int) { reversBiMapIterator __tmp = *this; _node = Iter::iter_finder_rev(_node); return __tmp; }
 		reversBiMapIterator& operator--() { _node = Iter::iter_finder(_node); return *this; }
       	reversBiMapIterator operator--(int) { reversBiMapIterator __tmp = *this; _node = Iter::iter_finder(_node); return __tmp; }
-		bool operator==(const reversBiMapIterator& __x) const { return _node == __x._node; }
-      	bool operator!=(const reversBiMapIterator& __x) const { return _node != __x._node; }		
+		friend bool operator!=(const reversBiMapIterator& l, const reversBiMapIterator& r)
+		{
+			return l._node != r._node;
+		}
+		
+		friend bool operator==(const reversBiMapIterator& l, const reversBiMapIterator& r)
+		{
+			return l._node == r._node;
+		}		
 	};
 }

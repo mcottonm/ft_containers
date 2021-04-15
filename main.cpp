@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:34:34 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/08 19:48:58 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/13 14:19:14 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 #include <unordered_set>
 #include "ft_unordered_set.hpp"
 #include "forward_iterator.hpp"
+#include <stack>
+#include "ft_stack.hpp"
 
 class A
 {
@@ -69,23 +71,12 @@ bool comp(int a, int b)
 
 void foo()
 {
-	std::unordered_set<std::string> a;
-	std::unordered_set<std::string> myset;
+	ft::vector<int> a;
+	ft::vector<int>::const_iterator it = a.begin();
+	ft::vector<int>::iterator it2 = a.begin();
+	a.insert(it, 20);
+	std::cout << (it != it2) << std::endl;
 	
-	// a.Add("office");
-	// a.Add("office");
-	// a.Add("house");
-	// a.Add("gym");
-	// a.Add("parking");
-	// a.Add("highway");
-	// a.insert("highway");
-	a.insert("house");
-	a.insert("office");
-	// a.insert("office");
-	// a.insert("gym");
-	// a.insert("parking");
-	std::unordered_set<std::string>::iterator it = a.begin();
-	std::cout << *++it << std::endl;
 }
 
 int main()

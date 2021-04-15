@@ -6,14 +6,14 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/18 18:28:19 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/03 18:56:03 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/14 16:24:46 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 # include <iostream>
-
+# include "ft_map_iterator.hpp"
 namespace ft
 {
 	template<typename T>
@@ -51,7 +51,7 @@ namespace ft
 		node_type*					_node;
 		
 	public:
-	
+		
 		BidirectionalIterator(): _node() {}
 		BidirectionalIterator(const BidirectionalIterator& other): _node(other._node) {}
 		BidirectionalIterator(const reversBiIterator<BidirectionalIterator>& other): _node(reversBiIterator<BidirectionalIterator>::get_node(other)) {}
@@ -65,6 +65,12 @@ namespace ft
 			return const_iterator<const value_type >((_list_node<const value_type>*)_node);
 		}
 
+		template <template <typename> class iterator>
+		operator iterator<typename remove_const<T>::type>()
+		{
+			return iterator<typename remove_const<T>::type>((_list_node<typename remove_const<T>::type>*)_node);
+		}
+		
 		static node_type* get_node(const BidirectionalIterator& iterator)
 		{
 			return(iterator._node);
@@ -92,30 +98,32 @@ namespace ft
 		typedef typename Iter::node_type	node_type;
 		
 	private:
-		node_type*					_node;
+		Iter					_node;
 		
 	public:
 	
 		reversBiIterator(): _node() {}
-		reversBiIterator(const Iter& other): _node(Iter::get_node(other)) {}
+		reversBiIterator(const Iter& other): _node(other) {}
 		reversBiIterator(const reversBiIterator& other): _node(other._node) {}
-		reversBiIterator(node_type* node): _node(node) {}
-		template <template <typename> class const_iterator>
-		operator const_iterator<const value_type>() 
-		{
-			return const_iterator<const value_type>((_list_node<const value_type>*)_node);
-		}
+
 		static node_type* get_node(const reversBiIterator& iterator)
 		{
 			return(iterator._node);
 		}
-		reversBiIterator & operator= (const reversBiIterator& other) { _node = other._node; return *this; }
-		reference operator*() const { return *_node->valptr(); }
+		
+		template <template <typename> class const_iterator>
+		operator const_iterator<const value_type>()
+		{
+			return const_iterator<const value_type >((_list_node<const value_type>*)_node);
+		}
+
+		reversBiIterator & operator= (const reversBiIterator& other) { _node = other; return *this; }
+		reference operator*() const { return *_node; }
 		pointer operator->() const { return _node->valptr(); }
-		reversBiIterator& operator--() { _node = _node->_next; return *this; }
-      	reversBiIterator operator--(int) { reversBiIterator __tmp = *this; _node = _node->_next; return __tmp; }
-		reversBiIterator& operator++() { _node = _node->_prev; return *this; }
-      	reversBiIterator operator++(int) { reversBiIterator __tmp = *this; _node = _node->_prev; return __tmp; }
+		reversBiIterator& operator--() { ++_node; return *this; }
+      	reversBiIterator operator--(int) { reversBiIterator __tmp = *this; ++_node; return __tmp; }
+		reversBiIterator& operator++() { --_node; return *this; }
+      	reversBiIterator operator++(int) { reversBiIterator __tmp = *this; --_node; return __tmp; }
 		friend bool operator!=(const reversBiIterator& l, const reversBiIterator& r)
 		{
 			return l._node != r._node;

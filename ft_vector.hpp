@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 20:23:54 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/03/29 17:53:50 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/14 16:50:55 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <utility>
 # include <type_traits>
 # include <algorithm>
-# include "ft_iterator.hpp"
+# include "ft_ra_iterator.hpp"
 
 // template <bool Res, typename T>
 // 	struct enable_if {};
@@ -75,22 +75,6 @@ namespace ft
 			}
 		}
 
-		// template <class _InputIterator, typename SAFETY = typename _InputIterator::value_type >
-		// vector(_InputIterator first, _InputIterator last,
-		// 			const allocator_type& alloc = allocator_type())
-		// {
-		// 	_capacity = last - first;
-		// 	_size = _capacity;
-		// 	data = allocator.allocate(_capacity);
-		// 	int i = 0;
-		// 	while(first != last)
-		// 	{
-		// 		allocator.construct(&data[i], *first);
-		// 		++first;
-		// 		++i;
-		// 	}
-		// }
-
 		vector(size_type count, const_reference value = value_type(),
 				const allocator_type& alloc = allocator_type())
 		: allocator(alloc)
@@ -107,7 +91,8 @@ namespace ft
 		, _size(other._size)
 		, _capacity(other._capacity)
 		{
-			data = allocator.allocate(_capacity);
+			if (_capacity)
+				data = allocator.allocate(_capacity);
 			for(size_t i = 0; i < _size; i++)
 				allocator.construct(&data[i], other.data[i]);
 		}
@@ -124,6 +109,8 @@ namespace ft
 		
 		vector &operator=(const vector& other)
 		{
+			if (this == &other)
+				return *this;
 			if (_capacity)
 				this->~vector();
 			data = allocator.allocate(other._capacity);
@@ -202,6 +189,8 @@ namespace ft
 		
 		void resize(size_type n, value_type val = value_type())
 		{
+			if (n >= max_size())
+				throw std::length_error("vector");
 			while (n < _size)
 				allocator.destroy(&data[--_size]);
 			if (n > _size)
@@ -216,7 +205,7 @@ namespace ft
 		void reserve(size_type n)
 		{
 			if (n >= max_size())
-				throw std::length_error("Out of max size.\n");
+				throw std::length_error("allocator<T>::allocate(size_t n) 'n' exceeds maximum supported size");
 			if (_capacity < n)
 			{
 				pointer tmp = allocator.allocate(n);
@@ -247,7 +236,7 @@ namespace ft
 		reference at(size_type n)
 		{
 			if (n >= _size)
-				throw std::out_of_range("Out of size.\n");
+				throw std::out_of_range("vector");
 			return(data[n]);
 		}
 
@@ -286,7 +275,7 @@ namespace ft
 			{
 				this->~vector();
 				if (new_size > max_size())
-					throw std::length_error("Out of max size.\n");
+					throw std::length_error("vector");
 				data = allocator.allocate(new_size);
 				_capacity = new_size;
 			}

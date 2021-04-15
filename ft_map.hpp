@@ -6,7 +6,7 @@
 /*   By: mcottonm <mcottonm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 15:33:13 by mcottonm          #+#    #+#             */
-/*   Updated: 2021/04/06 18:04:58 by mcottonm         ###   ########.fr       */
+/*   Updated: 2021/04/14 16:18:48 by mcottonm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -308,11 +308,11 @@ namespace ft
               const allocator_type& alloc = allocator_type())
         : allocator(alloc)
         , _key_cmp(comp)
+        , _value_cmp(_key_cmp)
         , _root(NULL)
 		, _nest(_new_empty_node())
         , _ground(_nest)
         , _size(0)
-        , _value_cmp(_key_cmp)
         {
         }
 
@@ -322,11 +322,11 @@ namespace ft
                   const allocator_type& alloc = allocator_type())
         : allocator(alloc)
         , _key_cmp(comp)
+        , _value_cmp(_key_cmp)
         , _root(NULL)
 		, _nest(_new_empty_node())
         , _ground(_nest)
         , _size(0)
-        , _value_cmp(_key_cmp)
         {
             while (first != last)
                 put_in(*first++, _root);
@@ -335,11 +335,11 @@ namespace ft
         map(const map& x)
         : allocator(x.allocator)
         , _key_cmp(x._key_cmp)
+        , _value_cmp(x._value_cmp)
         , _root(NULL)
         , _nest(_new_empty_node())
         , _ground(_nest)
         , _size(0)
-        , _value_cmp(x._value_cmp)
 		{
             const_iterator it = x.begin();
 		    while (it != x.end())
@@ -355,6 +355,8 @@ namespace ft
 
         map& operator= (const map& x)
         {
+            if (this == &x)
+                return *this;
             this->~map();
             _size = 0;
             _nest = _new_empty_node();
@@ -418,7 +420,7 @@ namespace ft
 
         bool empty() const
         {
-            return(_size);
+            return(!_size);
         }
 
         size_type size() const
@@ -442,7 +444,6 @@ namespace ft
             return(put_in(val, _root));
         }
 
-
         iterator insert (iterator position, const value_type& val)
         {
             return put_in(val, iterator::get_node(position)).first;
@@ -458,7 +459,6 @@ namespace ft
         void erase (iterator position)
         {
             delete_n(iterator::get_node(position));
-            --_size;
         }
 
         size_type erase (const key_type& k)
@@ -468,7 +468,6 @@ namespace ft
                 delete_n(_n);
             else
                 return 0;
-            --_size;
             return 1;
         }
 
@@ -507,7 +506,7 @@ namespace ft
         
         void clear()
         {
-            for(;_size > 0; _size--)
+            for(;_size > 0;)
                 delete_n(_root);
         }
 
@@ -523,7 +522,7 @@ namespace ft
 
 	private:
 	    
-        node_type* finder(node_type* _n, const key_type& k)
+        node_type* finder(node_type* _n, const key_type& k) const
         {
             if (_n->value.first == k)
                 return (_n);
@@ -539,6 +538,7 @@ namespace ft
                     return(_ground);
                 return (finder(_n->_left, k));
             }
+            return (_n);
         }
 		
     public:
